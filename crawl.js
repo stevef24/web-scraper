@@ -33,7 +33,22 @@ function getURLsFromHTML(html, baseURL) {
 }
 
 async function crawlPage(baseUrl, currentURL, pages) {
+	let baseURLobj = new URL(baseUrl);
+	let currentURLobj = new URL(currentURL);
+
+	if (baseURLobj.hostname !== currentURLobj.hostname) {
+		return pages;
+	}
+
+	const normalizedURL = normalizeURL(currentURL);
+	if (pages[normalizedURL] > 0) {
+		pages[normalizedURL] += 1;
+		return pages;
+	}
+	pages[normalizedURL] = 1;
+
 	console.log(`crawling ${baseUrl}`);
+
 	try {
 		const response = await fetch(baseUrl);
 		if (response.status > 399) {
@@ -45,10 +60,15 @@ async function crawlPage(baseUrl, currentURL, pages) {
 			console.log(`Got non-html response: ${contentType}`);
 			return;
 		}
-		console.log(await response.text());
+		const htmlBody = await response.text();
+		const nextURLs = getURLsFromHTML(htmlBody, baseUrl);
+		for (let nextURL of nextURLs) {
+			pages = await crawlPage(baseUrl, nextURL, pages);
+		}
 	} catch (err) {
 		console.log(err.message);
 	}
+	return pages;
 }
 
 module.exports = { normalizeURL, getURLsFromHTML, crawlPage };
