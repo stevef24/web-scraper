@@ -45,10 +45,11 @@ async function crawlPage(baseUrl, currentURL, pages) {
 		pages[normalizedURL] += 1;
 		return pages;
 	}
+
 	pages[normalizedURL] = 1;
 
-	console.log(`crawling ${baseUrl}`);
-
+	console.log(`Started crawling ${currentURL}`);
+	let htmlBody = "";
 	try {
 		const response = await fetch(baseUrl);
 		if (response.status > 399) {
@@ -60,13 +61,14 @@ async function crawlPage(baseUrl, currentURL, pages) {
 			console.log(`Got non-html response: ${contentType}`);
 			return;
 		}
-		const htmlBody = await response.text();
-		const nextURLs = getURLsFromHTML(htmlBody, baseUrl);
-		for (let nextURL of nextURLs) {
-			pages = await crawlPage(baseUrl, nextURL, pages);
-		}
+		htmlBody = await response.text();
 	} catch (err) {
 		console.log(err.message);
+	}
+	const nextURLs = getURLsFromHTML(htmlBody, baseUrl);
+
+	for (let nextURL of nextURLs) {
+		pages = await crawlPage(baseUrl, nextURL, pages);
 	}
 	return pages;
 }
