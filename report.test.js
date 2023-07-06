@@ -25,12 +25,12 @@ describe("prepare report for pages ", () => {
 		};
 		const actual = sortPages(input);
 		const expected = [
-			["https://wagslane.com/path", 1],
-			["https://wagslane.com", 3],
-			["https://wagslane.com/path/about/id", 4],
-			["https://wagslane.com/path/there", 12],
-			["https://wagslane.com/hello", 19],
 			["https://wagslane.com/about", 89],
+			["https://wagslane.com/hello", 19],
+			["https://wagslane.com/path/there", 12],
+			["https://wagslane.com/path/about/id", 4],
+			["https://wagslane.com/path/1", 3],
+			["https://wagslane.com/path", 1],
 		];
 		expect(actual).toEqual(expected);
 	});
